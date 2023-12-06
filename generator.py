@@ -1,65 +1,71 @@
 from jinja2 import Environment
 import os
 import shutil
-from jinja2 import BaseLoader, TemplateNotFound
+from jinja2 import FileSystemLoader
 from os.path import join, exists, getmtime
 
 
-class Loader(BaseLoader):
-    def __init__(self, path):
-        self.path = path
+# Class used to generate the site from the templates
+class SiteGenerator(object):
+    # Instantiate the dirs and templates
+    # The structure is assumed to be as follows
+    # project_root_dir
+    # ├── generator.py
+    # └── src_dir
+    #     ├── static_dir
+    #     |   ├── static_assets
+    #     |   └── static_assets
+    #     └── templates_dir
+    #         ├── template_1.html
+    #         └── template_2.html
 
-    def get_source(self, environment, template):
-        path = join(self.path, template)
-        if not exists(path):
-            raise TemplateNotFound(template)
-        mtime = getmtime(path)
-        with open(path, 'r') as f:
-            source = f.read()
-        return source, path, lambda: mtime == getmtime(path)
-
-
-class SourceBundle(object):
-    def __init__(self, static_dir='static', src_dir='src', templates=None, dist_dir='dist'):
-        if templates is None:
-            self.templates = ['index.html']
-        else:
-            self.templates = templates
-
+    def __init__(self, static_dir="static", src_dir="src", template_dir="templates", output_dir="output"):
+        self.template_dir = template_dir
         self.static_dir = static_dir
         self.src_dir = src_dir
-        self.dist_dir = dist_dir
+        self.output_dir = output_dir
 
+    # Get the root directory of the script.
     def _root(self):
         return os.path.dirname(os.path.abspath(__file__))
 
+    # Delete the output dir if exists
+    # Create a new output dir
     def clean(self):
-        if os.path.exists(self.dist_dir):
-            shutil.rmtree(self.dist_dir)
+        if os.path.exists(self.output_dir):
+            shutil.rmtree(self.output_dir)
+        os.mkdir(os.path.join(self._root(), self.output_dir))
 
-    def build(self, **kwargs):
-        if not os.path.exists(os.path.join(self._root(), self.dist_dir)):
-            os.mkdir(os.path.join(self._root(), self.dist_dir))
+    # Generate the site
+    def generate(self, **kwargs):
+        # Clean up output dir if it exists
+        self.clean()
 
+        # Copy static files to output dir
         if self.static_dir is not None:
-            if os.path.exists(os.path.join(self._root(), self.dist_dir, self.static_dir)):
-                shutil.rmtree(os.path.join(self._root(), self.dist_dir, self.static_dir))
             shutil.copytree(
                 os.path.join(self._root(), self.src_dir, self.static_dir),
-                os.path.join(self._root(), self.dist_dir, self.static_dir)
+                os.path.join(self._root(), self.output_dir, self.static_dir),
             )
 
-        env = Environment(loader=Loader(os.path.join(self._root(), self.src_dir)))
-        for template in self.templates:
-            with open(os.path.join(self._root(), self.dist_dir, template), 'w') as f2:
-                slug = env.get_template(template)
-                slug = slug.render(**kwargs)
-                f2.write(slug)
+        # Load Jinja2 environment
+        env = Environment(loader=FileSystemLoader(os.path.join(self._root(), self.src_dir, self.template_dir)))
+
+        # For every template in the template_dir
+        for template_name in os.listdir(os.path.join(self._root(), self.src_dir, self.template_dir)):
+            # Generate an appropriate html file in the outputdir with jinja
+            with open(os.path.join(self._root(), self.output_dir, template_name), "w") as f:
+                template = env.get_template(template_name)
+                content = template.render(**kwargs)
+                f.write(content)
 
         return True
 
-if __name__ == '__main__':
-    sb = SourceBundle(templates=[
-        'index.html'
-    ])
-    sb.build()
+
+# Main execution block.
+if __name__ == "__main__":
+    # Instantiate site generator
+    sb = SiteGenerator()
+
+    # Generate the site
+    sb.generate()
