@@ -26,6 +26,7 @@ Install Jinja2
 # How to use
 The general structure of your project should be:
 
+```
 static-site-generator
 ├── generator.py
 ├── README.md
@@ -38,7 +39,7 @@ static-site-generator
         └── template_1
         └── template_2
         └── template_3
-
+```
 
 
 Put any static files you have in the static dir, and any templates in the templates folder. Pretty self explanatory.
@@ -50,7 +51,9 @@ Your site will be generated in a folder called `output` in the project root. Cop
 
 # More
 Read more about Jinja2 syntax here:
+
 https://jinja.palletsprojects.com/en/3.0.x/templates/
 
 Inspired (and a lot of code just copied outright) by
+
 https://www.pybloggers.com/2016/03/a-really-minimal-static-website-generator-with-python-and-jinja2/
