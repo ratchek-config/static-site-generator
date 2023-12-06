@@ -3,18 +3,23 @@ When pelican and jekyll are overkill, and all you really need is an easy way to 
 
 # Setup
 Clone the repo
+
 `git clone git@github.com:ratchek-config/static-site-generator.git`
 
 Change into the directory
+
 `cd static-site-generator`
 
 Create a virtual environment
+
 `python3 -m venv env`
 
 Activate the virtual environment
+
 `source env/bin/activate`
 
 Install Jinja2
+
 `pip install Jinja2`
 
 
