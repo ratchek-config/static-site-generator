@@ -37,7 +37,9 @@ static-site-generator
 ```
 
 
-Put any static files you have in the static dir, and any templates in the templates folder. Pretty self explanatory.
+Put any static files you have in the static dir, and any templates in the templates folder. Pretty self explanatory.  
+Add any templates you want generated to the template_list in the main execution block at the bottom.
+(You don't want to generate *all* templates unless you're literally not using any Jinja inheritance or `include` statements)
 Then make sure the virtual environment is activated and run  
 `python generator.py`
 

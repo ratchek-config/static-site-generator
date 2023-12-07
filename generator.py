@@ -19,7 +19,13 @@ class SiteGenerator(object):
     #         ├── template_1.html
     #         └── template_2.html
 
-    def __init__(self, static_dir="static", src_dir="src", template_dir="templates", output_dir="output"):
+    def __init__(
+        self, static_dir="static", src_dir="src", template_dir="templates", output_dir="output", template_list=None
+    ):
+        if template_list is None:
+            self.template_list = ["index.html"]
+        else:
+            self.template_list = template_list
         self.template_dir = template_dir
         self.static_dir = static_dir
         self.src_dir = src_dir
@@ -52,7 +58,7 @@ class SiteGenerator(object):
         env = Environment(loader=FileSystemLoader(os.path.join(self._root(), self.src_dir, self.template_dir)))
 
         # For every template in the template_dir
-        for template_name in os.listdir(os.path.join(self._root(), self.src_dir, self.template_dir)):
+        for template_name in self.template_list:
             # Generate an appropriate html file in the outputdir with jinja
             with open(os.path.join(self._root(), self.output_dir, template_name), "w") as f:
                 template = env.get_template(template_name)
@@ -64,8 +70,9 @@ class SiteGenerator(object):
 
 # Main execution block.
 if __name__ == "__main__":
+    template_list = ["index.html"]
     # Instantiate site generator
-    sb = SiteGenerator()
+    sb = SiteGenerator(template_list=template_list)
 
     # Generate the site
     sb.generate()
