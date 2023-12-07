@@ -3,6 +3,7 @@ import os
 import shutil
 from jinja2 import FileSystemLoader
 from os.path import join, exists, getmtime
+import settings
 
 
 # Class used to generate the site from the templates
@@ -70,9 +71,14 @@ class SiteGenerator(object):
 
 # Main execution block.
 if __name__ == "__main__":
-    template_list = ["index.html"]
     # Instantiate site generator
-    sb = SiteGenerator(template_list=template_list)
+    sb = SiteGenerator(
+        static_dir=settings.STATIC_DIR,
+        src_dir=settings.SRC_DIR,
+        template_dir=settings.TEMPLATE_DIR,
+        output_dir=settings.OUTPUT_DIR,
+        template_list=settings.TEMPLATE_LIST,
+    )
 
     # Generate the site
     sb.generate()
